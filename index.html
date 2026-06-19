@@ -515,9 +515,268 @@ placeholder="コマンドを入力して Enter">
 
 <script>
 
-/* Part2で実装 */
-
 let currentDevice = null;
+
+function appendConsole(text){
+
+const consoleArea =
+document.getElementById("consoleOutput");
+
+consoleArea.textContent += "\n" + text;
+
+consoleArea.scrollTop =
+consoleArea.scrollHeight;
+
+}
+
+function selectDevice(device){
+
+document
+.querySelectorAll('.device')
+.forEach(d=>d.classList.remove('selected'));
+
+if(device==="PC-A")
+document.getElementById('pca').classList.add('selected');
+
+if(device==="SW1")
+document.getElementById('sw1').classList.add('selected');
+
+if(device==="R1")
+document.getElementById('r1').classList.add('selected');
+
+if(device==="PC-B")
+document.getElementById('pcb').classList.add('selected');
+
+currentDevice = device;
+
+document.getElementById('prompt').textContent =
+device + ">";
+
+appendConsole("\n" + device + " selected");
+}
+
+function executeCommand(command){
+
+if(!currentDevice){
+
+appendConsole(
+"機器を選択してください"
+);
+
+return;
+
+}
+
+command = command.trim().toLowerCase();
+
+appendConsole(
+currentDevice + "> " + command
+);
+
+if(command==="help"){
+
+appendConsole(
+`
+利用可能コマンド
+
+help
+show vlan brief
+show interface status
+show spanning-tree
+show ip route
+show ip interface brief
+ping
+`
+);
+
+return;
+
+}
+
+if(command==="show vlan brief"){
+
+if(currentDevice==="SW1"){
+
+appendConsole(
+`VLAN Name
+10   SALES
+20   USERS
+30   TEST`
+);
+
+}else{
+
+appendConsole(
+"% Invalid command"
+);
+
+}
+
+return;
+
+}
+
+if(command==="show interface status"){
+
+if(
+currentDevice==="SW1" ||
+currentDevice==="R1"
+){
+
+appendConsole(
+`Port     Status
+Gi0/0    up
+Gi0/1    up
+Gi0/2    up`
+);
+
+}else{
+
+appendConsole(
+"% Invalid command"
+);
+
+}
+
+return;
+
+}
+
+if(command==="show spanning-tree"){
+
+if(currentDevice==="SW1"){
+
+appendConsole(
+`
+Root ID 32768
+This bridge is root
+
+Port State
+Gi0/1 Forwarding
+Gi0/2 Forwarding
+`
+);
+
+}else{
+
+appendConsole(
+"% Invalid command"
+);
+
+}
+
+return;
+
+}
+
+if(command==="show ip route"){
+
+if(currentDevice==="R1"){
+
+appendConsole(
+`
+Codes: C - Connected
+
+C 192.168.1.0/24
+C 192.168.2.0/24
+S 0.0.0.0/0
+`
+);
+
+}else{
+
+appendConsole(
+"% Invalid command"
+);
+
+}
+
+return;
+
+}
+
+if(command==="show ip interface brief"){
+
+if(currentDevice==="R1"){
+
+appendConsole(
+`Interface      IP Address
+Gi0/0          192.168.1.1
+Gi0/1          192.168.2.1`
+);
+
+}else{
+
+appendConsole(
+"% Invalid command"
+);
+
+}
+
+return;
+
+}
+
+if(command==="ping"){
+
+appendConsole(
+`
+Sending 5, 100-byte ICMP Echos
+
+!!!!!
+
+Success rate is 100%
+`
+);
+
+return;
+
+}
+
+appendConsole(
+"% Unknown command"
+);
+
+}
+
+document
+.getElementById("commandInput")
+.addEventListener("keydown",function(e){
+
+if(e.key==="Enter"){
+
+executeCommand(this.value);
+
+this.value="";
+
+}
+
+});
+
+function checkAnswer(){
+
+alert(
+"Part3で実装予定"
+);
+
+}
+
+function newQuestion(){
+
+alert(
+"Part3で実装予定"
+);
+
+}
+
+function resetGame(){
+
+localStorage.clear();
+
+location.reload();
+
+}
+
 
 function selectDevice(device){
 
