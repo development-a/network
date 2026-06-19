@@ -3,287 +3,104 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Network Troubleshooting Simulator</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Network Build Challenge</title>
 
 <style>
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
 body{
-    font-family:Arial,sans-serif;
+    margin:0;
     background:#0f172a;
-    color:#e2e8f0;
-    min-height:100vh;
+    color:white;
+    font-family:sans-serif;
 }
 
 header{
     background:#1e293b;
     padding:15px;
     text-align:center;
-    border-bottom:2px solid #334155;
-}
-
-header h1{
-    font-size:28px;
-}
-
-header p{
-    color:#94a3b8;
-    margin-top:5px;
 }
 
 .container{
-    max-width:1400px;
+    max-width:1200px;
     margin:auto;
     padding:20px;
-}
-
-.top-panel{
-    display:grid;
-    grid-template-columns:300px 1fr 300px;
-    gap:20px;
-    margin-bottom:20px;
 }
 
 .card{
     background:#1e293b;
     border-radius:10px;
-    padding:15px;
-    border:1px solid #334155;
-}
-
-.card h2{
-    margin-bottom:10px;
-    font-size:20px;
-}
-
-.stat{
-    margin-bottom:12px;
-}
-
-.stat-label{
-    color:#94a3b8;
-    font-size:14px;
-}
-
-.stat-value{
-    font-size:24px;
-    font-weight:bold;
-}
-
-.network-area{
-    background:#1e293b;
-    border-radius:10px;
-    border:1px solid #334155;
-    padding:30px;
+    padding:20px;
     margin-bottom:20px;
 }
 
-.network-title{
-    margin-bottom:20px;
-    font-size:22px;
-    text-align:center;
-}
-
-.topology{
+.stats{
     display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:25px;
+    gap:20px;
     flex-wrap:wrap;
 }
 
-.device{
-    width:140px;
-    height:140px;
-    border:3px solid #475569;
-    border-radius:12px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    cursor:pointer;
-    transition:0.2s;
-    background:#0f172a;
+.stat{
+    flex:1;
+    min-width:150px;
 }
 
-.device:hover{
-    transform:scale(1.05);
-    border-color:#38bdf8;
+.label{
+    color:#94a3b8;
 }
 
-.device.selected{
-    border-color:#22c55e;
-    box-shadow:0 0 20px rgba(34,197,94,.5);
-}
-
-.device-icon{
-    font-size:50px;
-    margin-bottom:10px;
-}
-
-.device-name{
-    font-size:20px;
+.value{
+    font-size:30px;
     font-weight:bold;
 }
 
-.link{
-    width:60px;
-    height:4px;
-    background:#94a3b8;
-}
-
-.command-card{
-    margin-bottom:20px;
-}
-
-#commandList{
-    background:#0f172a;
-    color:#22c55e;
-    padding:15px;
-    border-radius:5px;
-    min-height:120px;
+.topology{
+    text-align:center;
     font-family:monospace;
-    white-space:pre-wrap;
+    font-size:22px;
+    line-height:2;
 }
 
-.console{
-    background:#000;
-    border-radius:10px;
-    overflow:hidden;
-}
-
-.console-header{
-    background:#111827;
-    padding:10px;
-    border-bottom:1px solid #374151;
-}
-
-.console-body{
-    height:450px;
-    overflow-y:auto;
-    padding:15px;
-    font-family:monospace;
-    color:#00ff00;
-    white-space:pre-wrap;
-}
-
-.console-input-area{
-    display:flex;
-    border-top:1px solid #374151;
-}
-
-.prompt{
-    background:#111827;
-    padding:12px;
-    color:#00ff00;
-    font-family:monospace;
-}
-
-.console-input{
-    flex:1;
-    background:#000;
+textarea{
+    width:100%;
+    height:250px;
+    background:black;
     color:#00ff00;
     border:none;
-    outline:none;
-    padding:12px;
+    padding:15px;
     font-family:monospace;
     font-size:16px;
 }
 
-.question-box{
-    background:#7c2d12;
-    border:1px solid #ea580c;
-    border-radius:10px;
-    padding:15px;
-    margin-bottom:20px;
-}
-
-.answer-panel{
-    margin-top:20px;
-}
-
-.answer-panel select{
-    width:100%;
-    padding:10px;
-    background:#0f172a;
-    color:white;
-    border:1px solid #475569;
-    border-radius:5px;
-    margin-bottom:10px;
-}
-
-.answer-panel button{
-    width:100%;
-    padding:12px;
+button{
+    padding:12px 20px;
     border:none;
-    background:#22c55e;
-    color:white;
-    font-size:16px;
+    border-radius:5px;
     cursor:pointer;
-    border-radius:5px;
+    color:white;
+    margin-right:10px;
 }
 
-.answer-panel button:hover{
+#checkBtn{
     background:#16a34a;
 }
 
-.ranking-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-.ranking-table th,
-.ranking-table td{
-    border:1px solid #475569;
-    padding:8px;
-    text-align:center;
-}
-
-.ranking-table th{
-    background:#334155;
-}
-
-.footer-buttons{
-    display:flex;
-    gap:10px;
-    margin-top:15px;
-}
-
-.footer-buttons button{
-    flex:1;
-    padding:10px;
-    cursor:pointer;
-    border:none;
-    border-radius:5px;
+#nextBtn{
     background:#2563eb;
-    color:white;
 }
 
-.footer-buttons button:hover{
-    background:#1d4ed8;
+#result{
+    margin-top:15px;
+    font-size:18px;
 }
 
-@media(max-width:1000px){
-
-.top-panel{
-    grid-template-columns:1fr;
+.success{
+    color:#22c55e;
 }
 
-.device{
-    width:100px;
-    height:100px;
-}
-
-.link{
-    width:30px;
-}
-
+.fail{
+    color:#ef4444;
 }
 
 </style>
@@ -293,176 +110,80 @@ header p{
 <body>
 
 <header>
-<h1>Network Troubleshooting Simulator</h1>
-<p>Level 1〜3 / VLAN・STP・Routing・Interface障害対応</p>
+<h1>Network Build Challenge</h1>
+<p>Cisco CLI構築トレーニング</p>
 </header>
 
 <div class="container">
 
-<div class="question-box">
-<h2>現在の障害</h2>
-<p id="questionText">
-PC-AからPC-BへPingが通りません。原因を調査してください。
+<div class="card">
+
+<div class="stats">
+
+<div class="stat">
+<div class="label">Level</div>
+<div class="value" id="level">1</div>
+</div>
+
+<div class="stat">
+<div class="label">Score</div>
+<div class="value" id="score">0</div>
+</div>
+
+<div class="stat">
+<div class="label">Correct</div>
+<div class="value" id="correct">0</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>課題</h2>
+
+<p id="question">
+VLAN10を作成してください
 </p>
-</div>
-
-<div class="top-panel">
-
-<div class="card">
-
-<h2>プレイヤー情報</h2>
-
-<div class="stat">
-<div class="stat-label">レベル</div>
-<div class="stat-value" id="level">1</div>
-</div>
-
-<div class="stat">
-<div class="stat-label">スコア</div>
-<div class="stat-value" id="score">0</div>
-</div>
-
-<div class="stat">
-<div class="stat-label">正答数</div>
-<div class="stat-value" id="correct">0</div>
-</div>
 
 </div>
 
 <div class="card">
 
-<h2>ランキング</h2>
-
-<table class="ranking-table">
-<thead>
-<tr>
-<th>順位</th>
-<th>スコア</th>
-</tr>
-</thead>
-
-<tbody id="rankingBody">
-<tr>
-<td>1</td>
-<td>0</td>
-</tr>
-</tbody>
-
-</table>
-
-</div>
-
-<div class="card">
-
-<h2>回答</h2>
-
-<div class="answer-panel">
-
-<select id="answerSelect">
-<option>VLAN設定ミス</option>
-<option>ポートShutdown</option>
-<option>STPブロック</option>
-<option>ルート不足</option>
-<option>IPアドレス誤設定</option>
-</select>
-
-<button onclick="checkAnswer()">
-回答する
-</button>
-
-</div>
-
-<div class="footer-buttons">
-
-<button onclick="newQuestion()">
-次の問題
-</button>
-
-<button onclick="resetGame()">
-リセット
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="network-area">
-
-<div class="network-title">
-ネットワーク構成図
-</div>
+<h2>構成図</h2>
 
 <div class="topology">
 
-<div class="device" id="pca" onclick="selectDevice('PC-A')">
-<div class="device-icon">💻</div>
-<div class="device-name">PC-A</div>
-</div>
-
-<div class="link"></div>
-
-<div class="device" id="sw1" onclick="selectDevice('SW1')">
-<div class="device-icon">🔀</div>
-<div class="device-name">SW1</div>
-</div>
-
-<div class="link"></div>
-
-<div class="device" id="r1" onclick="selectDevice('R1')">
-<div class="device-icon">📡</div>
-<div class="device-name">R1</div>
-</div>
-
-<div class="link"></div>
-
-<div class="device" id="pcb" onclick="selectDevice('PC-B')">
-<div class="device-icon">💻</div>
-<div class="device-name">PC-B</div>
-</div>
+PC-A <br>
+｜ <br>
+SW1 <br>
+｜ <br>
+PC-B
 
 </div>
 
 </div>
 
-<div class="card command-card">
+<div class="card">
 
-<h2>使用可能コマンド</h2>
+<h2>CLI入力</h2>
 
-<pre id="commandList">
-機器を選択してください
-</pre>
+<textarea
+id="cliInput"
+placeholder="ここに設定を入力してください"></textarea>
 
-</div>
+<br><br>
 
-<div class="console">
+<button id="checkBtn"
+onclick="checkAnswer()">
+採点する </button>
 
-<div class="console-header">
-CLI Console
-</div>
+<button id="nextBtn"
+onclick="nextQuestion()">
+次の問題 </button>
 
-<div class="console-body" id="consoleOutput">
-
-Network Troubleshooting Simulator
-
-機器をクリックしてください。
-
-</div>
-
-<div class="console-input-area">
-
-<div class="prompt" id="prompt">
->
-</div>
-
-<input
-type="text"
-class="console-input"
-id="commandInput"
-placeholder="コマンドを入力して Enter">
-
-</div>
+<div id="result"></div>
 
 </div>
 
@@ -470,347 +191,7 @@ placeholder="コマンドを入力して Enter">
 
 <script>
 
-
-let currentDevice = null;
-
-function appendConsole(text){
-
-const consoleArea =
-document.getElementById("consoleOutput");
-
-consoleArea.textContent += "\n" + text;
-
-consoleArea.scrollTop =
-consoleArea.scrollHeight;
-
-}
-
-function updateCommandList(){
-
-const area =
-document.getElementById("commandList");
-
-if(!currentDevice){
-
-area.textContent =
-`機器を選択してください`;
-
-return;
-
-}
-
-if(currentDevice==="SW1"){
-
-area.textContent =
-`show vlan brief
-show interface status
-show spanning-tree
-help`;
-
-return;
-
-}
-
-if(currentDevice==="R1"){
-
-area.textContent =
-`show ip route
-show ip interface brief
-show interface status
-ping
-help`;
-
-return;
-
-}
-
-if(
-currentDevice==="PC-A" ||
-currentDevice==="PC-B"
-){
-
-area.textContent =
-`ping
-help`;
-
-return;
-
-}
-
-}
-
-function selectDevice(device){
-
-document
-.querySelectorAll('.device')
-.forEach(d=>d.classList.remove('selected'));
-
-if(device==="PC-A"){
-document.getElementById('pca').classList.add('selected');
-}
-
-if(device==="SW1"){
-document.getElementById('sw1').classList.add('selected');
-}
-
-if(device==="R1"){
-document.getElementById('r1').classList.add('selected');
-}
-
-if(device==="PC-B"){
-document.getElementById('pcb').classList.add('selected');
-}
-
-currentDevice = device;
-
-document.getElementById('prompt').textContent =
-device + ">";
-
-appendConsole(
-"\n" + device + " selected"
-);
-
-updateCommandList();
-
-}
-
-function executeCommand(command){
-
-if(command.trim()===""){
-return;
-}
-
-if(!currentDevice){
-
-appendConsole(
-"機器を選択してください"
-);
-
-return;
-
-}
-
-command =
-command.trim().toLowerCase();
-
-appendConsole(
-currentDevice + "> " + command
-);
-
-if(command==="help"){
-
-appendConsole(
-`
-利用可能コマンドは
-上部の一覧を参照してください
-`
-);
-
-return;
-
-}
-
-if(command==="show vlan brief"){
-
-if(currentDevice==="SW1"){
-
-appendConsole(
-`
-VLAN Name
-10   SALES
-20   USERS
-30   TEST
-`
-);
-
-}else{
-
-appendConsole(
-"% Invalid command"
-);
-
-}
-
-return;
-
-}
-
-if(command==="show interface status"){
-
-if(
-currentDevice==="SW1" ||
-currentDevice==="R1"
-){
-
-appendConsole(
-`
-Port     Status
-Gi0/0    up
-Gi0/1    up
-Gi0/2    up
-`
-);
-
-}else{
-
-appendConsole(
-"% Invalid command"
-);
-
-}
-
-return;
-
-}
-
-if(command==="show spanning-tree"){
-
-if(currentDevice==="SW1"){
-
-appendConsole(
-`
-Root ID 32768
-This bridge is root
-
-Port State
-Gi0/1 Forwarding
-Gi0/2 Forwarding
-`
-);
-
-}else{
-
-appendConsole(
-"% Invalid command"
-);
-
-}
-
-return;
-
-}
-
-if(command==="show ip route"){
-
-if(currentDevice==="R1"){
-
-appendConsole(
-`
-Codes: C - Connected
-
-C 192.168.1.0/24
-C 192.168.2.0/24
-S 0.0.0.0/0
-`
-);
-
-}else{
-
-appendConsole(
-"% Invalid command"
-);
-
-}
-
-return;
-
-}
-
-if(command==="show ip interface brief"){
-
-if(currentDevice==="R1"){
-
-appendConsole(
-`
-Interface      IP Address
-Gi0/0          192.168.1.1
-Gi0/1          192.168.2.1
-`
-);
-
-}else{
-
-appendConsole(
-"% Invalid command"
-);
-
-}
-
-return;
-
-}
-
-if(command==="ping"){
-
-appendConsole(
-`
-Sending 5, 100-byte ICMP Echos
-
-!!!!!
-
-Success rate is 100%
-`
-);
-
-return;
-
-}
-
-appendConsole(
-"% Unknown command"
-);
-
-}
-
-document
-.getElementById("commandInput")
-.addEventListener(
-"keydown",
-function(e){
-
-if(e.key==="Enter"){
-
-executeCommand(
-this.value
-);
-
-this.value="";
-
-}
-
-}
-);
-
-function checkAnswer(){
-
-alert(
-"Part3で実装予定"
-);
-
-}
-
-function newQuestion(){
-
-alert(
-"Part3で実装予定"
-);
-
-}
-
-function resetGame(){
-
-localStorage.clear();
-
-location.reload();
-
-}
-
-window.onload = function(){
-
-updateCommandList();
-
-};
-
+/* Part2をここへ貼る */
 
 </script>
 
