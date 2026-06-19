@@ -7,6 +7,7 @@
 <title>Network Troubleshooting Simulator</title>
 
 <style>
+
 *{
     margin:0;
     padding:0;
@@ -137,9 +138,18 @@ header p{
     background:#94a3b8;
 }
 
-.console-container{
-    display:grid;
-    grid-template-columns:1fr;
+.command-card{
+    margin-bottom:20px;
+}
+
+#commandList{
+    background:#0f172a;
+    color:#22c55e;
+    padding:15px;
+    border-radius:5px;
+    min-height:120px;
+    font-family:monospace;
+    white-space:pre-wrap;
 }
 
 .console{
@@ -192,10 +202,6 @@ header p{
     border-radius:10px;
     padding:15px;
     margin-bottom:20px;
-}
-
-.question-box h2{
-    margin-bottom:10px;
 }
 
 .answer-panel{
@@ -277,16 +283,7 @@ header p{
 .link{
     width:30px;
 }
-}
 
-
-#commandList{
-background:#0f172a;
-color:#22c55e;
-padding:15px;
-border-radius:5px;
-min-height:120px;
-font-family:monospace;
 }
 
 </style>
@@ -303,13 +300,10 @@ font-family:monospace;
 <div class="container">
 
 <div class="question-box">
-
 <h2>現在の障害</h2>
-
 <p id="questionText">
 PC-AからPC-BへPingが通りません。原因を調査してください。
 </p>
-
 </div>
 
 <div class="top-panel">
@@ -348,12 +342,10 @@ PC-AからPC-BへPingが通りません。原因を調査してください。
 </thead>
 
 <tbody id="rankingBody">
-
 <tr>
 <td>1</td>
 <td>0</td>
 </tr>
-
 </tbody>
 
 </table>
@@ -367,13 +359,11 @@ PC-AからPC-BへPingが通りません。原因を調査してください。
 <div class="answer-panel">
 
 <select id="answerSelect">
-
 <option>VLAN設定ミス</option>
 <option>ポートShutdown</option>
 <option>STPブロック</option>
 <option>ルート不足</option>
 <option>IPアドレス誤設定</option>
-
 </select>
 
 <button onclick="checkAnswer()">
@@ -406,73 +396,37 @@ PC-AからPC-BへPingが通りません。原因を調査してください。
 
 <div class="topology">
 
-<div class="device"
-id="pca"
-onclick="selectDevice('PC-A')">
-
-<div class="device-icon">
-💻
-</div>
-
-<div class="device-name">
-PC-A
-</div>
-
+<div class="device" id="pca" onclick="selectDevice('PC-A')">
+<div class="device-icon">💻</div>
+<div class="device-name">PC-A</div>
 </div>
 
 <div class="link"></div>
 
-<div class="device"
-id="sw1"
-onclick="selectDevice('SW1')">
-
-<div class="device-icon">
-🔀
-</div>
-
-<div class="device-name">
-SW1
-</div>
-
+<div class="device" id="sw1" onclick="selectDevice('SW1')">
+<div class="device-icon">🔀</div>
+<div class="device-name">SW1</div>
 </div>
 
 <div class="link"></div>
 
-<div class="device"
-id="r1"
-onclick="selectDevice('R1')">
-
-<div class="device-icon">
-📡
-</div>
-
-<div class="device-name">
-R1
-</div>
-
+<div class="device" id="r1" onclick="selectDevice('R1')">
+<div class="device-icon">📡</div>
+<div class="device-name">R1</div>
 </div>
 
 <div class="link"></div>
 
-<div class="device"
-id="pcb"
-onclick="selectDevice('PC-B')">
-
-<div class="device-icon">
-💻
-</div>
-
-<div class="device-name">
-PC-B
+<div class="device" id="pcb" onclick="selectDevice('PC-B')">
+<div class="device-icon">💻</div>
+<div class="device-name">PC-B</div>
 </div>
 
 </div>
 
 </div>
 
-</div>
-
-<div class="card">
+<div class="card command-card">
 
 <h2>使用可能コマンド</h2>
 
@@ -482,42 +436,24 @@ PC-B
 
 </div>
 
-<div class="console-container">
-
 <div class="console">
 
 <div class="console-header">
-
 CLI Console
-
 </div>
 
-<div
-class="console-body"
-id="consoleOutput">
+<div class="console-body" id="consoleOutput">
 
 Network Troubleshooting Simulator
 
 機器をクリックしてください。
-
-利用可能コマンド:
-
-help
-show vlan brief
-show interface status
-show spanning-tree
-show ip route
-show ip interface brief
-ping
 
 </div>
 
 <div class="console-input-area">
 
 <div class="prompt" id="prompt">
-
 >
-
 </div>
 
 <input
@@ -532,9 +468,8 @@ placeholder="コマンドを入力して Enter">
 
 </div>
 
-</div>
-
 <script>
+
 
 let currentDevice = null;
 
@@ -554,10 +489,6 @@ function updateCommandList(){
 
 const area =
 document.getElementById("commandList");
-
-if(!area){
-return;
-}
 
 if(!currentDevice){
 
@@ -614,24 +545,30 @@ document
 .querySelectorAll('.device')
 .forEach(d=>d.classList.remove('selected'));
 
-if(device==="PC-A")
+if(device==="PC-A"){
 document.getElementById('pca').classList.add('selected');
+}
 
-if(device==="SW1")
+if(device==="SW1"){
 document.getElementById('sw1').classList.add('selected');
+}
 
-if(device==="R1")
+if(device==="R1"){
 document.getElementById('r1').classList.add('selected');
+}
 
-if(device==="PC-B")
+if(device==="PC-B"){
 document.getElementById('pcb').classList.add('selected');
+}
 
 currentDevice = device;
 
 document.getElementById('prompt').textContent =
 device + ">";
 
-appendConsole("\n" + device + " selected");
+appendConsole(
+"\n" + device + " selected"
+);
 
 updateCommandList();
 
@@ -653,7 +590,8 @@ return;
 
 }
 
-command = command.trim().toLowerCase();
+command =
+command.trim().toLowerCase();
 
 appendConsole(
 currentDevice + "> " + command
@@ -662,8 +600,10 @@ currentDevice + "> " + command
 if(command==="help"){
 
 appendConsole(
-`利用可能コマンドは
-右側の一覧を参照してください`
+`
+利用可能コマンドは
+上部の一覧を参照してください
+`
 );
 
 return;
@@ -675,10 +615,12 @@ if(command==="show vlan brief"){
 if(currentDevice==="SW1"){
 
 appendConsole(
-`VLAN Name
+`
+VLAN Name
 10   SALES
 20   USERS
-30   TEST`
+30   TEST
+`
 );
 
 }else{
@@ -701,10 +643,12 @@ currentDevice==="R1"
 ){
 
 appendConsole(
-`Port     Status
+`
+Port     Status
 Gi0/0    up
 Gi0/1    up
-Gi0/2    up`
+Gi0/2    up
+`
 );
 
 }else{
@@ -777,9 +721,11 @@ if(command==="show ip interface brief"){
 if(currentDevice==="R1"){
 
 appendConsole(
-`Interface      IP Address
+`
+Interface      IP Address
 Gi0/0          192.168.1.1
-Gi0/1          192.168.2.1`
+Gi0/1          192.168.2.1
+`
 );
 
 }else{
@@ -824,7 +770,9 @@ function(e){
 
 if(e.key==="Enter"){
 
-executeCommand(this.value);
+executeCommand(
+this.value
+);
 
 this.value="";
 
@@ -863,62 +811,6 @@ updateCommandList();
 
 };
 
-
-localStorage.clear();
-
-location.reload();
-
-}
-
-
-function selectDevice(device){
-
-document
-.querySelectorAll('.device')
-.forEach(d=>d.classList.remove('selected'));
-
-if(device==="PC-A")
-document.getElementById('pca').classList.add('selected');
-
-if(device==="SW1")
-document.getElementById('sw1').classList.add('selected');
-
-if(device==="R1")
-document.getElementById('r1').classList.add('selected');
-
-if(device==="PC-B")
-document.getElementById('pcb').classList.add('selected');
-
-currentDevice=device;
-
-document.getElementById('prompt').textContent=
-device+">";
-
-}
-
-function checkAnswer(){
-
-alert(
-"Part3で実装予定"
-);
-
-}
-
-function newQuestion(){
-
-alert(
-"Part3で実装予定"
-);
-
-}
-
-function resetGame(){
-
-localStorage.clear();
-
-location.reload();
-
-}
 
 </script>
 
