@@ -1,44 +1,35 @@
 const SCENARIOS = [
 
+/* =====================================================
+   STAGE 1
+   VLAN設定ミス
+===================================================== */
+
 {
     id: 1,
 
     title: "VLAN設定ミス",
 
-    level: 1,
-
     mission:
-        "PC1からServer1へPingを成功させよ。",
+        "PC1からServer1へPingを成功させよ",
 
     topology: {
         pcIp: "192.168.10.10/24",
         serverIp: "192.168.20.10/24"
     },
 
-    rootCause:
-        "SW1 Gi0/2 の VLAN設定ミス",
+    state: {
 
-    keywords: [
-        "vlan",
-        "gi0/2",
-        "設定ミス"
-    ],
+        vlan20Configured: false
 
-    commands: {
+    },
 
-        help:
-`使用可能コマンド
-
-show vlan
-show interface
-show ip route
-ping
-help`,
+    showCommands: {
 
         "show vlan":
 `VLAN Name
-10   USERS
-20   SERVERS`,
+10 USERS
+20 SERVERS`,
 
         "show interface":
 `Gi0/1 access vlan 10
@@ -46,150 +37,181 @@ Gi0/2 access vlan 999`,
 
         "show ip route":
 `C 192.168.10.0/24
-C 192.168.20.0/24`,
+C 192.168.20.0/24`
+    },
 
-        "ping 192.168.20.10":
-`Request timed out`
-    }
+    configCommands: {
+
+        "switchport access vlan 20":
+            (state) =>
+            {
+                state.vlan20Configured = true;
+            }
+    },
+
+    clearCondition:
+        (state) =>
+        {
+            return state.vlan20Configured;
+        }
 },
+
+/* =====================================================
+   STAGE 2
+   デフォルトGW未設定
+===================================================== */
 
 {
     id: 2,
 
-    title: "デフォルトゲートウェイ漏れ",
-
-    level: 2,
+    title: "デフォルトGW未設定",
 
     mission:
-        "ServerへPingを成功させよ",
+        "PC1にデフォルトGWを設定してPingを成功させよ",
 
     topology: {
         pcIp: "192.168.10.10/24",
         serverIp: "192.168.20.10/24"
     },
 
-    rootCause:
-        "PC1のデフォルトゲートウェイ未設定",
+    state: {
 
-    keywords: [
-        "gateway",
-        "gw",
-        "デフォルト"
-    ],
+        gatewayConfigured: false
 
-    commands: {
+    },
 
-        help:
-`使用可能コマンド
-
-show ip
-show ip route
-ping
-help`,
+    showCommands: {
 
         "show ip":
 `PC1
-IP 192.168.10.10
-GW Not Configured`,
+
+IP Address
+192.168.10.10
+
+Default Gateway
+Not Configured`,
 
         "show ip route":
 `C 192.168.10.0/24
-C 192.168.20.0/24`,
+C 192.168.20.0/24`
+    },
 
-        "ping 192.168.20.10":
-`Destination Host Unreachable`
-    }
+    configCommands: {
+
+        "ip default-gateway 192.168.10.1":
+            (state) =>
+            {
+                state.gatewayConfigured = true;
+            }
+    },
+
+    clearCondition:
+        (state) =>
+        {
+            return state.gatewayConfigured;
+        }
 },
+
+/* =====================================================
+   STAGE 3
+   ACL拒否
+===================================================== */
 
 {
     id: 3,
 
-    title: "ACLによる通信拒否",
-
-    level: 3,
+    title: "ACL拒否",
 
     mission:
-        "ACLを調査して通信を復旧せよ",
+        "ACLを修正してPingを成功させよ",
 
     topology: {
         pcIp: "10.1.1.10/24",
         serverIp: "10.2.2.10/24"
     },
 
-    rootCause:
-        "ACLがICMPを拒否",
+    state: {
 
-    keywords: [
-        "acl",
-        "icmp",
-        "deny"
-    ],
+        aclFixed: false
 
-    commands: {
+    },
 
-        help:
-`使用可能コマンド
-
-show access-list
-show ip route
-ping
-help`,
+    showCommands: {
 
         "show access-list":
-`ACL 100
+`Extended IP access list 100
 
-deny icmp any any
-permit ip any any`,
+10 deny icmp any any
+20 permit ip any any`,
 
         "show ip route":
 `C 10.1.1.0/24
-C 10.2.2.0/24`,
+C 10.2.2.0/24`
+    },
 
-        "ping 10.2.2.10":
-`Request timed out`
-    }
+    configCommands: {
+
+        "no deny icmp any any":
+            (state) =>
+            {
+                state.aclFixed = true;
+            }
+    },
+
+    clearCondition:
+        (state) =>
+        {
+            return state.aclFixed;
+        }
 },
+
+/* =====================================================
+   STAGE 4
+   スタティックルート漏れ
+===================================================== */
 
 {
     id: 4,
 
     title: "スタティックルート漏れ",
 
-    level: 4,
-
     mission:
-        "ルーティングを確認して復旧せよ",
+        "スタティックルートを設定してPingを成功させよ",
 
     topology: {
         pcIp: "172.16.1.10/24",
         serverIp: "172.16.3.10/24"
     },
 
-    rootCause:
-        "R1のスタティックルート設定漏れ",
+    state: {
 
-    keywords: [
-        "route",
-        "static",
-        "ルート"
-    ],
+        routeConfigured: false
 
-    commands: {
+    },
 
-        help:
-`使用可能コマンド
-
-show ip route
-ping
-help`,
+    showCommands: {
 
         "show ip route":
-`C 172.16.1.0/24
-C 172.16.2.0/24`,
+`Codes: C - connected
 
-        "ping 172.16.3.10":
-`Network unreachable`
-    }
+C 172.16.1.0/24
+C 172.16.2.0/24`
+    },
+
+    configCommands: {
+
+        "ip route 172.16.3.0 255.255.255.0 10.0.0.2":
+            (state) =>
+            {
+                state.routeConfigured = true;
+            }
+    },
+
+    clearCondition:
+        (state) =>
+        {
+            return state.routeConfigured;
+        }
 }
 
 ];
