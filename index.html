@@ -1,298 +1,140 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pingを通せ！障害切り分けシミュレーター</title>
 
-<title>Pingが通るネットワークを作れ！</title>
-
-<style>
-
-body{
-    margin:0;
-    background:#0f172a;
-    color:white;
-    font-family:sans-serif;
-}
-
-header{
-    background:#1e293b;
-    padding:15px;
-    text-align:center;
-}
-
-.container{
-    max-width:1200px;
-    margin:auto;
-    padding:20px;
-}
-
-.card{
-    background:#1e293b;
-    padding:20px;
-    border-radius:10px;
-    margin-bottom:20px;
-}
-
-.topology{
-    text-align:center;
-    font-size:28px;
-    line-height:2;
-    font-family:monospace;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
-}
-
-input,select{
-    width:100%;
-    padding:10px;
-    margin-top:5px;
-    margin-bottom:15px;
-    border:none;
-    border-radius:5px;
-}
-
-button{
-    background:#2563eb;
-    color:white;
-    border:none;
-    padding:12px 20px;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:16px;
-}
-
-button:hover{
-    opacity:.9;
-}
-
-#result{
-    margin-top:20px;
-    font-size:20px;
-    font-weight:bold;
-}
-
-.success{
-    color:#22c55e;
-}
-
-.fail{
-    color:#ef4444;
-}
-
-</style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <header>
-<h1>Pingが通るネットワークを作れ！</h1>
-<p>レベル1 VLAN + Trunk</p>
+    <h1>Pingを通せ！障害切り分けシミュレーター</h1>
+
+    <div class="player-info">
+        <span id="level">Lv.1</span>
+        <span id="score">Score: 0</span>
+    </div>
 </header>
 
-<div class="container">
+<main>
 
-<div class="card">
-<h2>課題</h2>
+    <!-- 左側 -->
+    <section class="top-panel">
 
-<p>
+        <div class="network-card">
+            <h2>ネットワーク構成図</h2>
 
-PC-A と PC-B が通信できるようにしてください。
+            <div id="network-diagram">
 
-正解条件
+                <div class="device pc">
+                    <div class="device-name">PC1</div>
+                    <div class="device-ip">192.168.10.10/24</div>
+                </div>
 
-・Gi0/1 → VLAN10
+                <div class="line"></div>
 
-・Gi0/2 → VLAN10
+                <div class="device switch">
+                    <div class="device-name">SW1</div>
+                </div>
 
-・Gi0/24 → Trunk ON
+                <div class="line"></div>
 
-</p>
+                <div class="device router">
+                    <div class="device-name">R1</div>
+                </div>
 
-</div>
+                <div class="line"></div>
 
-<div class="card">
+                <div class="device server">
+                    <div class="device-name">Server1</div>
+                    <div class="device-ip">192.168.20.10/24</div>
+                </div>
 
-<h2>構成図</h2>
+            </div>
+        </div>
 
-<div class="topology">
+        <div class="objective-card">
+            <h2>ミッション</h2>
 
-💻PC-A
+            <p id="mission-text">
+                PC1からServer1へPingを成功させよ。
+            </p>
 
-│
+            <div class="status-box">
+                <span id="ping-status" class="status-fail">
+                    Ping失敗
+                </span>
+            </div>
+        </div>
 
-🔀SW1
+    </section>
 
-│
+    <!-- CLI -->
+    <section class="console-panel">
 
-💻PC-B
+        <div class="console-header">
+            Terminal
+        </div>
 
-</div>
+        <div id="console-output" class="console-output">
 
-</div>
+            <div>
+                Welcome to Network Trouble Simulator
+            </div>
 
-<div class="grid">
+            <div>
+                help と入力するとコマンド一覧が表示されます
+            </div>
 
-<div class="card">
+        </div>
 
-<h2>PC-A</h2>
+        <div class="console-input-area">
 
-<label>IPアドレス</label>
-<input
-id="pcaIp"
-value="192.168.1.10">
+            <span class="prompt">&gt;</span>
 
-<h2>SW1</h2>
+            <input
+                type="text"
+                id="command-input"
+                autocomplete="off"
+                placeholder="show vlan"
+            >
 
-<label>Gi0/1 VLAN</label>
-<select id="g1">
+        </div>
 
-<option>1</option>
-<option>10</option>
-<option>20</option>
+    </section>
 
-</select>
+    <!-- 回答エリア -->
+    <section class="answer-panel">
 
-<label>Gi0/2 VLAN</label>
-<select id="g2">
+        <h2>障害原因を回答</h2>
 
-<option>1</option>
-<option>10</option>
-<option>20</option>
+        <textarea
+            id="answer-input"
+            rows="4"
+            placeholder="例：SW1 Gi0/2 の VLAN設定ミス"
+        ></textarea>
 
-</select>
+        <button id="submit-answer">
+            回答する
+        </button>
 
-<label>Gi0/24 Trunk</label>
-<select id="trunk">
+    </section>
 
-<option>OFF</option>
-<option>ON</option>
+</main>
 
-</select>
+<footer>
+    GitHub Pages Edition
+</footer>
 
-</div>
+<script src="data/scenarios.js"></script>
 
-<div class="card">
-
-<h2>PC-B</h2>
-
-<label>IPアドレス</label>
-<input
-id="pcbIp"
-value="192.168.1.20">
-
-<h2>操作</h2>
-
-<button onclick="runPing()">
-Ping実行
-</button>
-
-<div id="result"></div>
-
-</div>
-
-</div>
-
-</div>
-
-<script>
-
-function runPing(){
-
-const g1 =
-document.getElementById("g1").value;
-
-const g2 =
-document.getElementById("g2").value;
-
-const trunk =
-document.getElementById("trunk").value;
-
-const pcaIp =
-document.getElementById("pcaIp").value;
-
-const pcbIp =
-document.getElementById("pcbIp").value;
-
-const result =
-document.getElementById("result");
-
-if(g1 !== "10"){
-
-result.className="fail";
-
-result.innerHTML=
-"❌ Gi0/1がVLAN10ではありません";
-
-return;
-
-}
-
-if(g2 !== "10"){
-
-result.className="fail";
-
-result.innerHTML=
-"❌ Gi0/2がVLAN10ではありません";
-
-return;
-
-}
-
-if(trunk !== "ON"){
-
-result.className="fail";
-
-result.innerHTML=
-"❌ Trunkが有効ではありません";
-
-return;
-
-}
-
-if(
-!pcaIp.startsWith("192.168.1.")
-){
-
-result.className="fail";
-
-result.innerHTML=
-"❌ PC-AのIPが不正です";
-
-return;
-
-}
-
-if(
-!pcbIp.startsWith("192.168.1.")
-){
-
-result.className="fail";
-
-result.innerHTML=
-"❌ PC-BのIPが不正です";
-
-return;
-
-}
-
-result.className="success";
-
-result.innerHTML=
-`
-✅ Ping成功
-
-Reply from ${pcbIp}
-
-bytes=32 time<1ms TTL=128
-`;
-
-}
-
-</script>
+<script src="js/storage.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/cli.js"></script>
+<script src="js/game.js"></script>
+<script src="js/app.js"></script>
 
 </body>
 </html>
