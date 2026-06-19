@@ -3,137 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pingを通せ！障害切り分けシミュレーター</title>
+    <title>Pingを通せ！障害復旧シミュレーター</title>
 
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <header>
-    <h1>Pingを通せ！障害切り分けシミュレーター</h1>
+
+    <h1>Pingを通せ！障害復旧シミュレーター</h1>
 
     <div class="player-info">
-        <span id="level">Lv.1</span>
-        <span id="score">Score: 0</span>
+
+        <span id="level">
+            Lv.1
+        </span>
+
+        <span id="score">
+            Score: 0
+        </span>
+
+        <button onclick="restartGame()">
+            リスタート
+        </button>
+
+        <button onclick="resetProgress()">
+            データ削除
+        </button>
+
     </div>
+
 </header>
 
 <main>
 
-    <!-- 左側 -->
     <section class="top-panel">
 
         <div class="network-card">
+
             <h2>ネットワーク構成図</h2>
 
             <div id="network-diagram">
 
                 <div class="device pc">
-                    <div class="device-name">PC1</div>
-                    <div class="device-ip">192.168.10.10/24</div>
+
+                    <div class="device-name">
+                        PC1
+                    </div>
+
+                    <div class="device-ip">
+                        192.168.10.10/24
+                    </div>
+
                 </div>
 
                 <div class="line"></div>
 
                 <div class="device switch">
-                    <div class="device-name">SW1</div>
+
+                    <div class="device-name">
+                        SW1
+                    </div>
+
                 </div>
 
                 <div class="line"></div>
 
                 <div class="device router">
-                    <div class="device-name">R1</div>
+
+                    <div class="device-name">
+                        R1
+                    </div>
+
                 </div>
 
                 <div class="line"></div>
 
                 <div class="device server">
-                    <div class="device-name">Server1</div>
-                    <div class="device-ip">192.168.20.10/24</div>
+
+                    <div class="device-name">
+                        Server1
+                    </div>
+
+                    <div class="device-ip">
+                        192.168.20.10/24
+                    </div>
+
                 </div>
 
             </div>
+
         </div>
 
         <div class="objective-card">
+
             <h2>ミッション</h2>
 
             <p id="mission-text">
-                PC1からServer1へPingを成功させよ。
+                ロード中...
             </p>
 
             <div class="status-box">
-                <span id="ping-status" class="status-fail">
+
+                <span
+                    id="ping-status"
+                    class="status-fail">
+
                     Ping失敗
+
                 </span>
+
             </div>
+
         </div>
 
     </section>
 
-    <!-- CLI -->
     <section class="console-panel">
 
         <div class="console-header">
-            Terminal
+
+            Cisco IOS Simulator
+
         </div>
 
-        <div id="console-output" class="console-output">
-
-            <div>
-                Welcome to Network Trouble Simulator
-            </div>
-
-            <div>
-                help と入力するとコマンド一覧が表示されます
-            </div>
+        <div
+            id="console-output"
+            class="console-output">
 
         </div>
 
         <div class="console-input-area">
 
-            <span class="prompt">&gt;</span>
+            <span
+                id="cli-prompt"
+                class="prompt">
+
+                R1#
+
+            </span>
 
             <input
                 type="text"
                 id="command-input"
                 autocomplete="off"
-                placeholder="show vlan"
+                spellcheck="false"
+                placeholder="show interface"
             >
 
         </div>
 
     </section>
 
-    <!-- 回答エリア -->
-    <section class="answer-panel">
+    <section class="help-panel">
 
-        <h2>障害原因を回答</h2>
+        <h2>操作方法</h2>
 
-        <textarea
-            id="answer-input"
-            rows="4"
-            placeholder="例：SW1 Gi0/2 の VLAN設定ミス"
-        ></textarea>
+        <ul>
 
-        <button id="submit-answer">
-            回答する
-        </button>
+            <li>
+                showコマンドで調査する
+            </li>
+
+            <li>
+                conf tで設定モードに入る
+            </li>
+
+            <li>
+                設定変更してPingを成功させる
+            </li>
+
+            <li>
+                Ping成功でステージクリア
+            </li>
+
+        </ul>
 
     </section>
 
 </main>
 
 <footer>
+
     GitHub Pages Edition
+
 </footer>
 
 <script src="data/scenarios.js"></script>
 
 <script src="js/storage.js"></script>
-<script src="js/renderer.js"></script>
-<script src="js/cli.js"></script>
+
 <script src="js/game.js"></script>
+
+<script src="js/cli.js"></script>
+
 <script src="js/app.js"></script>
 
 </body>
