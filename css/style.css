@@ -1,0 +1,279 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#10151c;
+    color:#ffffff;
+    font-family:
+    "Segoe UI",
+    sans-serif;
+
+    min-height:100vh;
+
+    display:flex;
+    flex-direction:column;
+}
+
+header{
+    background:#18222e;
+
+    padding:20px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    border-bottom:1px solid #2f3b4b;
+}
+
+header h1{
+    font-size:24px;
+}
+
+.player-info{
+    display:flex;
+    gap:20px;
+    font-weight:bold;
+}
+
+main{
+    flex:1;
+
+    padding:20px;
+
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.top-panel{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+.network-card,
+.objective-card,
+.console-panel,
+.answer-panel{
+    background:#18222e;
+
+    border-radius:12px;
+
+    padding:20px;
+
+    border:1px solid #2c3948;
+}
+
+.network-card h2,
+.objective-card h2,
+.answer-panel h2{
+    margin-bottom:15px;
+}
+
+#network-diagram{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    gap:20px;
+
+    min-height:220px;
+}
+
+.device{
+    width:120px;
+    height:120px;
+
+    border-radius:12px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+
+    font-weight:bold;
+}
+
+.pc{
+    background:#2563eb;
+}
+
+.switch{
+    background:#16a34a;
+}
+
+.router{
+    background:#ca8a04;
+}
+
+.server{
+    background:#9333ea;
+}
+
+.device-ip{
+    font-size:12px;
+    margin-top:8px;
+}
+
+.line{
+    width:60px;
+    height:4px;
+
+    background:#ffffff;
+}
+
+.status-box{
+    margin-top:20px;
+}
+
+.status-fail{
+    background:#dc2626;
+    padding:8px 16px;
+    border-radius:8px;
+}
+
+.status-success{
+    background:#16a34a;
+    padding:8px 16px;
+    border-radius:8px;
+}
+
+.console-panel{
+    display:flex;
+    flex-direction:column;
+}
+
+.console-header{
+    margin-bottom:10px;
+    font-weight:bold;
+}
+
+.console-output{
+
+    background:#000000;
+
+    height:350px;
+
+    overflow-y:auto;
+
+    padding:15px;
+
+    font-family:Consolas, monospace;
+
+    border-radius:8px;
+
+    white-space:pre-wrap;
+}
+
+.console-output div{
+    margin-bottom:8px;
+}
+
+.console-input-area{
+
+    margin-top:10px;
+
+    display:flex;
+    align-items:center;
+
+    gap:10px;
+}
+
+.prompt{
+    color:#00ff66;
+    font-family:Consolas, monospace;
+}
+
+#command-input{
+
+    flex:1;
+
+    background:#111827;
+
+    color:white;
+
+    border:1px solid #374151;
+
+    border-radius:8px;
+
+    padding:12px;
+
+    outline:none;
+}
+
+#command-input:focus{
+    border-color:#60a5fa;
+}
+
+.answer-panel textarea{
+
+    width:100%;
+
+    background:#111827;
+
+    color:white;
+
+    border:1px solid #374151;
+
+    border-radius:8px;
+
+    padding:12px;
+
+    resize:vertical;
+}
+
+#submit-answer{
+
+    margin-top:15px;
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 20px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:16px;
+}
+
+#submit-answer:hover{
+    opacity:0.9;
+}
+
+footer{
+
+    text-align:center;
+
+    padding:15px;
+
+    background:#18222e;
+
+    border-top:1px solid #2f3b4b;
+}
+
+@media(max-width:900px){
+
+    .top-panel{
+        grid-template-columns:1fr;
+    }
+
+    #network-diagram{
+        flex-direction:column;
+    }
+
+    .line{
+        width:4px;
+        height:40px;
+    }
+}
