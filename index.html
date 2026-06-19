@@ -189,11 +189,235 @@ onclick="nextQuestion()">
 
 </div>
 
-<script>
+const questions = [
 
-/* Part2をここへ貼る */
+{
+level:1,
+question:"VLAN10を作成してください",
+keywords:[
+"vlan 10"
+]
+},
 
-</script>
+{
+level:1,
+question:"VLAN20を作成してください",
+keywords:[
+"vlan 20"
+]
+},
+
+{
+level:2,
+question:"Gi0/1をVLAN10へ割り当ててください",
+keywords:[
+"interface gi0/1",
+"switchport access vlan 10"
+]
+},
+
+{
+level:2,
+question:"Gi0/2をVLAN20へ割り当ててください",
+keywords:[
+"interface gi0/2",
+"switchport access vlan 20"
+]
+},
+
+{
+level:3,
+question:"Gi0/24をTrunkポートにしてください",
+keywords:[
+"interface gi0/24",
+"switchport mode trunk"
+]
+},
+
+{
+level:4,
+question:"VLAN10のSVIを作成してください",
+keywords:[
+"interface vlan 10",
+"ip address"
+]
+},
+
+{
+level:5,
+question:"Gi0/0へ192.168.1.1/24を設定してください",
+keywords:[
+"interface gi0/0",
+"ip address 192.168.1.1 255.255.255.0"
+]
+},
+
+{
+level:6,
+question:"OSPFプロセス1を起動してください",
+keywords:[
+"router ospf 1"
+]
+},
+
+{
+level:7,
+question:"10.0.0.0/24をarea0へ広告してください",
+keywords:[
+"network 10.0.0.0 0.0.0.255 area 0"
+]
+},
+
+{
+level:8,
+question:"デフォルトルートを設定してください",
+keywords:[
+"ip route 0.0.0.0 0.0.0.0"
+]
+}
+
+];
+
+let currentQuestion = 0;
+
+let score =
+parseInt(
+localStorage.getItem("score")
+) || 0;
+
+let correct =
+parseInt(
+localStorage.getItem("correct")
+) || 0;
+
+document.getElementById("score").textContent =
+score;
+
+document.getElementById("correct").textContent =
+correct;
+
+loadQuestion();
+
+function loadQuestion(){
+
+const q =
+questions[currentQuestion];
+
+document.getElementById("question")
+.textContent =
+q.question;
+
+document.getElementById("level")
+.textContent =
+q.level;
+
+document.getElementById("cliInput")
+.value = "";
+
+document.getElementById("result")
+.innerHTML = "";
+
+}
+
+function checkAnswer(){
+
+const input =
+document
+.getElementById("cliInput")
+.value
+.toLowerCase();
+
+const q =
+questions[currentQuestion];
+
+let success = true;
+
+for(
+let keyword of q.keywords
+){
+
+if(
+!input.includes(
+keyword.toLowerCase()
+)
+){
+
+success = false;
+break;
+
+}
+
+}
+
+const result =
+document.getElementById("result");
+
+if(success){
+
+score +=
+q.level * 10;
+
+correct++;
+
+localStorage.setItem(
+"score",
+score
+);
+
+localStorage.setItem(
+"correct",
+correct
+);
+
+document.getElementById("score")
+.textContent =
+score;
+
+document.getElementById("correct")
+.textContent =
+correct;
+
+result.className =
+"success";
+
+result.innerHTML =
+"✅ 正解！";
+
+}else{
+
+result.className =
+"fail";
+
+result.innerHTML =
+"❌ 不正解";
+
+}
+
+}
+
+function nextQuestion(){
+
+currentQuestion++;
+
+if(
+currentQuestion >=
+questions.length
+){
+
+currentQuestion = 0;
+
+}
+
+loadQuestion();
+
+}
+
+window.onload = function(){
+
+loadQuestion();
+
+}
+
 
 </body>
 </html>
