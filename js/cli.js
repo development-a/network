@@ -2,22 +2,33 @@ class CLI
 {
     constructor()
     {
-        this.outputElement =
-            document.getElementById("console-output");
+        this.output =
+            document.getElementById(
+                "console-output"
+            );
 
-        this.inputElement =
-            document.getElementById("command-input");
+        this.input =
+            document.getElementById(
+                "command-input"
+            );
 
-        this.commandHistory = [];
+        this.promptElement =
+            document.getElementById(
+                "cli-prompt"
+            );
 
-        this.historyIndex = -1;
+        this.mode = "exec";
+
+        this.history = [];
+
+        this.historyIndex = 0;
 
         this.registerEvents();
     }
 
     registerEvents()
     {
-        this.inputElement.addEventListener(
+        this.input.addEventListener(
             "keydown",
             (event) =>
             {
@@ -42,77 +53,185 @@ class CLI
     execute()
     {
         const command =
-            this.inputElement.value.trim();
+            this.input.value.trim();
 
         if(command === "")
         {
             return;
         }
 
-        this.commandHistory.push(command);
+        this.history.push(command);
 
         this.historyIndex =
-            this.commandHistory.length;
+            this.history.length;
 
         this.print(
-            `> ${command}`
+            `${this.getPrompt()} ${command}`
         );
 
         const result =
             this.processCommand(command);
 
-        this.print(result);
+        if(result)
+        {
+            this.print(result);
+        }
 
-        this.inputElement.value = "";
+        this.input.value = "";
     }
 
     processCommand(command)
     {
-        if(!window.game)
-        {
-            return "ゲーム初期化中...";
-        }
-
         const scenario =
             window.game.currentScenario;
 
-        if(!scenario)
+        /* ------------------
+           exec mode
+        ------------------- */
+
+        if(command === "conf t")
         {
-            return "シナリオがありません";
+            this.mode = "config";
+
+            this.updatePrompt();
+
+            return "Enter configuration mode";
         }
 
-        const commands =
-            scenario.commands;
-
-        if(commands[command])
+        if(command === "exit")
         {
-            return commands[command];
+            if(this.mode === "interface")
+            {
+                this.mode = "config";
+            }
+            else if(this.mode === "config")
+            {
+                this.mode = "exec";
+            }
+
+            this.updatePrompt();
+
+            return "";
         }
-
-        if(command.startsWith("ping "))
-        {
-            return this.handlePing(command);
-        }
-
-        return `% Unknown command:
-${command}
-
-help を入力してください`;
-    }
-
-    handlePing(command)
-    {
-        const scenario =
-            window.game.currentScenario;
 
         if(
-            scenario.commands[command]
+            command ===
+            "interface gi0/2"
         )
         {
-            return scenario.commands[command];
+            this.mode =
+                "interface";
+
+            this.updatePrompt();
+
+            return "";
         }
 
-        return "Request timed out";
+        /* ------------------
+           show commands
+        ------------------- */
+
+        if(
+            scenario.showCommands[
+                command
+            ]
+        )
+        {
+            return scenario
+                .showCommands[
+                    command
+                ];
+        }
+
+        /* ------------------
+           config commands
+        ------------------- */
+
+        if(
+            scenario.configCommands[
+                command
+            ]
+        )
+        {
+            scenario
+                .configCommands[
+                    command
+                ](
+                    scenario.state
+                );
+
+            return "OK";
+        }
+
+        /* ------------------
+           ping
+        ------------------- */
+
+        if(
+            command.startsWith(
+                "ping "
+            )
+        )
+        {
+            return this.handlePing();
+        }
+
+        return "% Invalid command";
+    }
+
+    handlePing()
+    {
+        const success =
+            window.game.ping();
+
+        if(success)
+        {
+            setTimeout(
+                () =>
+                {
+                    window.game
+                        .completeStage();
+                },
+                500
+            );
+
+            return `
+Reply from destination
+Reply from destination
+Reply from destination
+
+Success rate 100%
+`;
+        }
+
+        return `
+Request timed out
+Request timed out
+Request timed out
+
+Success rate 0%
+`;
+    }
+
+    getPrompt()
+    {
+        switch(this.mode)
+        {
+            case "config":
+                return "R1(config)#";
+
+            case "interface":
+                return "R1(config-if)#";
+
+            default:
+                return "R1#";
+        }
+    }
+
+    updatePrompt()
+    {
+        this.promptElement.textContent =
+            this.getPrompt();
     }
 
     print(text)
@@ -122,21 +241,50 @@ help を入力してください`;
 
         line.textContent = text;
 
-        this.outputElement.appendChild(line);
+        this.output.appendChild(line);
 
-        this.outputElement.scrollTop =
-            this.outputElement.scrollHeight;
+        this.output.scrollTop =
+            this.output.scrollHeight;
     }
 
     clear()
     {
-        this.outputElement.innerHTML = "";
+        this.output.innerHTML = "";
+    }
+
+    welcome()
+    {
+        this.print(
+`==================================
+Pingを通せ！
+障害復旧シミュレーター
+==================================`
+        );
+
+        this.print(
+            window.game
+                .currentScenario
+                .mission
+        );
+
+        this.print("");
+    }
+
+    resetForStage()
+    {
+        this.mode = "exec";
+
+        this.updatePrompt();
+
+        this.clear();
+
+        this.welcome();
     }
 
     historyUp()
     {
         if(
-            this.commandHistory.length === 0
+            this.history.length === 0
         )
         {
             return;
@@ -149,8 +297,8 @@ help を入力してください`;
             this.historyIndex = 0;
         }
 
-        this.inputElement.value =
-            this.commandHistory[
+        this.input.value =
+            this.history[
                 this.historyIndex
             ];
     }
@@ -158,7 +306,7 @@ help を入力してください`;
     historyDown()
     {
         if(
-            this.commandHistory.length === 0
+            this.history.length === 0
         )
         {
             return;
@@ -168,102 +316,20 @@ help を入力してください`;
 
         if(
             this.historyIndex >=
-            this.commandHistory.length
+            this.history.length
         )
         {
             this.historyIndex =
-                this.commandHistory.length;
+                this.history.length;
 
-            this.inputElement.value = "";
+            this.input.value = "";
 
             return;
         }
 
-        this.inputElement.value =
-            this.commandHistory[
+        this.input.value =
+            this.history[
                 this.historyIndex
             ];
     }
-
-    welcome()
-    {
-        this.print(
-`==================================
-Pingを通せ！
-障害切り分けシミュレーター
-==================================`
-        );
-
-        this.print(
-            "help と入力してください"
-        );
-
-        this.print("");
-    }
-
-    printMission()
-    {
-        const scenario =
-            window.game.currentScenario;
-
-        if(!scenario)
-        {
-            return;
-        }
-
-        this.print(
-`------------------------------
-ミッション
-------------------------------
-${scenario.mission}`
-        );
-
-        this.print("");
-    }
-
-    printSuccess()
-    {
-        this.print("");
-
-        this.print(
-`################################
-MISSION COMPLETE
-################################`
-        );
-
-        this.print(
-            "Ping通信が復旧しました"
-        );
-
-        this.print("");
-    }
-
-    printFailure()
-    {
-        this.print("");
-
-        this.print(
-            "不正解です"
-        );
-
-        this.print(
-            "再度調査してください"
-        );
-
-        this.print("");
-    }
-
-    printLevelUp(level)
-    {
-        this.print("");
-
-        this.print(
-            `Level Up !!
-現在レベル: ${level}`
-        );
-
-        this.print("");
-    }
 }
-
-window.cli = new CLI();
