@@ -2,130 +2,79 @@ document.addEventListener(
     "DOMContentLoaded",
     () =>
     {
-        initializeGame();
+        startGame();
     }
 );
 
-function initializeGame()
+
+function startGame()
 {
-    window.game = new Game();
+    window.game =
+        new Game();
 
-    initializeAnswerForm();
 
-    initializeKeyboard();
+    window.cli =
+        new CLI();
 
-    updateHeader();
 
     window.cli.welcome();
 
-    window.cli.printMission();
-}
 
-function initializeAnswerForm()
-{
-    const submitButton =
-        document.getElementById(
-            "submit-answer"
-        );
+    updateScreen();
 
-    const answerInput =
-        document.getElementById(
-            "answer-input"
-        );
 
-    submitButton.addEventListener(
-        "click",
-        () =>
-        {
-            submitAnswer();
-        }
-    );
-
-    answerInput.addEventListener(
-        "keydown",
-        (event) =>
-        {
-            if(
-                event.key === "Enter" &&
-                !event.shiftKey
-            )
-            {
-                event.preventDefault();
-
-                submitAnswer();
-            }
-        }
-    );
-}
-
-function initializeKeyboard()
-{
-    const commandInput =
+    const input =
         document.getElementById(
             "command-input"
         );
 
-    commandInput.focus();
 
-    document.addEventListener(
-        "click",
-        () =>
-        {
-            commandInput.focus();
-        }
-    );
+    input.focus();
 }
 
-function submitAnswer()
+
+
+/*
+----------------------------------
+ 画面更新
+----------------------------------
+*/
+
+function updateScreen()
 {
-    const answerInput =
-        document.getElementById(
-            "answer-input"
-        );
-
-    const answer =
-        answerInput.value.trim();
-
-    if(answer === "")
+    if(!window.game)
     {
-        alert(
-            "障害原因を入力してください"
-        );
-
         return;
     }
 
-    const result =
-        window.game.submitAnswer(
-            answer
-        );
 
-    if(result)
-    {
-        answerInput.value = "";
-
-        updateHeader();
-    }
-}
-
-function updateHeader()
-{
-    const levelElement =
+    const level =
         document.getElementById(
             "level"
         );
 
-    const scoreElement =
+
+    const score =
         document.getElementById(
             "score"
         );
 
-    levelElement.textContent =
+
+    level.textContent =
         `Lv.${window.game.level}`;
 
-    scoreElement.textContent =
+
+    score.textContent =
         `Score: ${window.game.score}`;
 }
+
+
+
+/*
+----------------------------------
+ リスタート
+----------------------------------
+*/
 
 function restartGame()
 {
@@ -138,10 +87,20 @@ function restartGame()
         return;
     }
 
+
     window.game.restart();
 
-    updateHeader();
+
+    updateScreen();
 }
+
+
+
+/*
+----------------------------------
+ データ削除
+----------------------------------
+*/
 
 function resetProgress()
 {
@@ -154,13 +113,34 @@ function resetProgress()
         return;
     }
 
-    localStorage.clear();
+
+    clearAllData();
+
 
     location.reload();
 }
 
-window.restartGame =
-    restartGame;
 
-window.resetProgress =
-    resetProgress;
+
+/*
+----------------------------------
+ キーボード補助
+----------------------------------
+*/
+
+document.addEventListener(
+    "keydown",
+    (event)=>
+    {
+        if(event.key === "/")
+        {
+            event.preventDefault();
+
+            document
+            .getElementById(
+                "command-input"
+            )
+            .focus();
+        }
+    }
+);
