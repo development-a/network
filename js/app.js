@@ -1,20 +1,23 @@
 document.addEventListener(
     "DOMContentLoaded",
-    () =>
-    {
-        startGame();
-    }
+    initGame
 );
 
 
-function startGame()
+
+/*
+----------------------------------
+ 初期化
+----------------------------------
+*/
+
+function initGame()
 {
-    window.game =
-        new Game();
+    window.game = new Game();
 
-
-    window.cli =
-        new CLI();
+    window.cli = new CLI(
+        window.game
+    );
 
 
     window.cli.welcome();
@@ -23,13 +26,29 @@ function startGame()
     updateScreen();
 
 
+    focusCommandInput();
+}
+
+
+
+/*
+----------------------------------
+ 入力欄フォーカス
+----------------------------------
+*/
+
+function focusCommandInput()
+{
     const input =
         document.getElementById(
             "command-input"
         );
 
 
-    input.focus();
+    if(input)
+    {
+        input.focus();
+    }
 }
 
 
@@ -60,12 +79,18 @@ function updateScreen()
         );
 
 
-    level.textContent =
-        `Lv.${window.game.level}`;
+    if(level)
+    {
+        level.textContent =
+            `Lv.${window.game.level}`;
+    }
 
 
-    score.textContent =
-        `Score: ${window.game.score}`;
+    if(score)
+    {
+        score.textContent =
+            `Score: ${window.game.score}`;
+    }
 }
 
 
@@ -88,10 +113,22 @@ function restartGame()
     }
 
 
-    window.game.restart();
+    if(window.game)
+    {
+        window.game.restart();
+    }
+
+
+    if(window.cli)
+    {
+        window.cli.reset();
+        window.cli.welcome();
+    }
 
 
     updateScreen();
+
+    focusCommandInput();
 }
 
 
@@ -114,7 +151,12 @@ function resetProgress()
     }
 
 
-    clearAllData();
+    if(
+        typeof clearAllData === "function"
+    )
+    {
+        clearAllData();
+    }
 
 
     location.reload();
@@ -130,17 +172,25 @@ function resetProgress()
 
 document.addEventListener(
     "keydown",
-    (event)=>
+    function(event)
     {
+
         if(event.key === "/")
         {
             event.preventDefault();
 
-            document
-            .getElementById(
-                "command-input"
-            )
-            .focus();
+            focusCommandInput();
         }
+
+
+        if(
+            event.key === "F2"
+        )
+        {
+            event.preventDefault();
+
+            restartGame();
+        }
+
     }
 );
