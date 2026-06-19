@@ -1,72 +1,125 @@
 const STORAGE_KEYS = {
 
-    HIGH_SCORE: "networkGameHighScore",
+    CURRENT_LEVEL:
+        "networkSimulatorCurrentLevel",
 
-    CURRENT_SCORE: "networkGameCurrentScore",
+    CURRENT_SCORE:
+        "networkSimulatorCurrentScore",
 
-    CURRENT_LEVEL: "networkGameCurrentLevel"
+    HIGH_SCORE:
+        "networkSimulatorHighScore"
 };
+
+/* ==========================
+   Level
+========================== */
+
+function saveLevel(level)
+{
+    localStorage.setItem(
+        STORAGE_KEYS.CURRENT_LEVEL,
+        String(level)
+    );
+}
+
+function getLevel()
+{
+    const value =
+        localStorage.getItem(
+            STORAGE_KEYS.CURRENT_LEVEL
+        );
+
+    if(value === null)
+    {
+        return 1;
+    }
+
+    return Number(value);
+}
+
+/* ==========================
+   Score
+========================== */
 
 function saveScore(score)
 {
     localStorage.setItem(
         STORAGE_KEYS.CURRENT_SCORE,
-        score
+        String(score)
     );
 
-    const highScore = getHighScore();
+    const highScore =
+        getHighScore();
 
     if(score > highScore)
     {
         localStorage.setItem(
             STORAGE_KEYS.HIGH_SCORE,
-            score
+            String(score)
         );
     }
 }
 
 function getScore()
 {
-    return Number(
+    const value =
         localStorage.getItem(
             STORAGE_KEYS.CURRENT_SCORE
-        ) || 0
-    );
+        );
+
+    if(value === null)
+    {
+        return 0;
+    }
+
+    return Number(value);
 }
+
+/* ==========================
+   High Score
+========================== */
 
 function getHighScore()
 {
-    return Number(
+    const value =
         localStorage.getItem(
             STORAGE_KEYS.HIGH_SCORE
-        ) || 0
+        );
+
+    if(value === null)
+    {
+        return 0;
+    }
+
+    return Number(value);
+}
+
+/* ==========================
+   Reset
+========================== */
+
+function clearProgress()
+{
+    localStorage.removeItem(
+        STORAGE_KEYS.CURRENT_LEVEL
+    );
+
+    localStorage.removeItem(
+        STORAGE_KEYS.CURRENT_SCORE
     );
 }
 
-function saveLevel(level)
+function clearAllData()
 {
-    localStorage.setItem(
-        STORAGE_KEYS.CURRENT_LEVEL,
-        level
+    localStorage.removeItem(
+        STORAGE_KEYS.CURRENT_LEVEL
     );
-}
 
-function getLevel()
-{
-    return Number(
-        localStorage.getItem(
-            STORAGE_KEYS.CURRENT_LEVEL
-        ) || 1
-    );
-}
-
-function resetProgress()
-{
     localStorage.removeItem(
         STORAGE_KEYS.CURRENT_SCORE
     );
 
     localStorage.removeItem(
-        STORAGE_KEYS.CURRENT_LEVEL
+        STORAGE_KEYS.HIGH_SCORE
     );
 }
