@@ -529,6 +529,64 @@ consoleArea.scrollHeight;
 
 }
 
+function updateCommandList(){
+
+const area =
+document.getElementById("commandList");
+
+if(!area){
+return;
+}
+
+if(!currentDevice){
+
+area.textContent =
+`機器を選択してください`;
+
+return;
+
+}
+
+if(currentDevice==="SW1"){
+
+area.textContent =
+`show vlan brief
+show interface status
+show spanning-tree
+help`;
+
+return;
+
+}
+
+if(currentDevice==="R1"){
+
+area.textContent =
+`show ip route
+show ip interface brief
+show interface status
+ping
+help`;
+
+return;
+
+}
+
+if(
+currentDevice==="PC-A" ||
+currentDevice==="PC-B"
+){
+
+area.textContent =
+`ping
+help`;
+
+return;
+
+}
+
+}
+
 function selectDevice(device){
 
 document
@@ -553,9 +611,16 @@ document.getElementById('prompt').textContent =
 device + ">";
 
 appendConsole("\n" + device + " selected");
+
+updateCommandList();
+
 }
 
 function executeCommand(command){
+
+if(command.trim()===""){
+return;
+}
 
 if(!currentDevice){
 
@@ -576,17 +641,8 @@ currentDevice + "> " + command
 if(command==="help"){
 
 appendConsole(
-`
-利用可能コマンド
-
-help
-show vlan brief
-show interface status
-show spanning-tree
-show ip route
-show ip interface brief
-ping
-`
+`利用可能コマンドは
+右側の一覧を参照してください`
 );
 
 return;
@@ -741,7 +797,9 @@ appendConsole(
 
 document
 .getElementById("commandInput")
-.addEventListener("keydown",function(e){
+.addEventListener(
+"keydown",
+function(e){
 
 if(e.key==="Enter"){
 
@@ -751,7 +809,8 @@ this.value="";
 
 }
 
-});
+}
+);
 
 function checkAnswer(){
 
@@ -770,6 +829,19 @@ alert(
 }
 
 function resetGame(){
+
+localStorage.clear();
+
+location.reload();
+
+}
+
+window.onload = function(){
+
+updateCommandList();
+
+};
+
 
 localStorage.clear();
 
