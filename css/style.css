@@ -7,9 +7,7 @@
 body{
     background:#10151c;
     color:#ffffff;
-    font-family:
-    "Segoe UI",
-    sans-serif;
+    font-family:"Segoe UI",sans-serif;
 
     min-height:100vh;
 
@@ -35,48 +33,77 @@ header h1{
 
 .player-info{
     display:flex;
-    gap:20px;
-    font-weight:bold;
+    align-items:center;
+    gap:15px;
+}
+
+.player-info button{
+
+    background:#2563eb;
+
+    border:none;
+
+    color:white;
+
+    padding:8px 14px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+}
+
+.player-info button:hover{
+    opacity:0.9;
 }
 
 main{
+
     flex:1;
 
     padding:20px;
 
     display:flex;
     flex-direction:column;
+
     gap:20px;
 }
 
 .top-panel{
+
     display:grid;
+
     grid-template-columns:2fr 1fr;
+
     gap:20px;
 }
 
 .network-card,
 .objective-card,
 .console-panel,
-.answer-panel{
+.help-panel{
+
     background:#18222e;
 
     border-radius:12px;
 
     padding:20px;
 
-    border:1px solid #2c3948;
+    border:1px solid #2f3b4b;
 }
 
 .network-card h2,
 .objective-card h2,
-.answer-panel h2{
+.help-panel h2{
+
     margin-bottom:15px;
 }
 
 #network-diagram{
+
     display:flex;
+
     justify-content:center;
+
     align-items:center;
 
     gap:20px;
@@ -85,14 +112,19 @@ main{
 }
 
 .device{
+
     width:120px;
+
     height:120px;
 
     border-radius:12px;
 
     display:flex;
+
     flex-direction:column;
+
     justify-content:center;
+
     align-items:center;
 
     text-align:center;
@@ -117,40 +149,48 @@ main{
 }
 
 .device-ip{
-    font-size:12px;
+
     margin-top:8px;
+
+    font-size:12px;
 }
 
 .line{
+
     width:60px;
+
     height:4px;
 
-    background:#ffffff;
+    background:white;
 }
 
 .status-box{
+
     margin-top:20px;
 }
 
 .status-fail{
+
     background:#dc2626;
+
     padding:8px 16px;
+
     border-radius:8px;
 }
 
 .status-success{
+
     background:#16a34a;
+
     padding:8px 16px;
+
     border-radius:8px;
 }
 
-.console-panel{
-    display:flex;
-    flex-direction:column;
-}
-
 .console-header{
+
     margin-bottom:10px;
+
     font-weight:bold;
 }
 
@@ -158,36 +198,49 @@ main{
 
     background:#000000;
 
-    height:350px;
+    color:#00ff66;
+
+    height:450px;
 
     overflow-y:auto;
 
     padding:15px;
 
-    font-family:Consolas, monospace;
-
     border-radius:8px;
 
-    white-space:pre-wrap;
-}
+    font-family:
+        Consolas,
+        Monaco,
+        monospace;
 
-.console-output div{
-    margin-bottom:8px;
+    white-space:pre-wrap;
+
+    line-height:1.5;
 }
 
 .console-input-area{
 
-    margin-top:10px;
+    margin-top:12px;
 
     display:flex;
+
     align-items:center;
 
     gap:10px;
 }
 
 .prompt{
+
     color:#00ff66;
-    font-family:Consolas, monospace;
+
+    font-family:
+        Consolas,
+        Monaco,
+        monospace;
+
+    font-weight:bold;
+
+    min-width:100px;
 }
 
 #command-input{
@@ -205,50 +258,26 @@ main{
     padding:12px;
 
     outline:none;
+
+    font-family:
+        Consolas,
+        Monaco,
+        monospace;
 }
 
 #command-input:focus{
+
     border-color:#60a5fa;
 }
 
-.answer-panel textarea{
+.help-panel ul{
 
-    width:100%;
-
-    background:#111827;
-
-    color:white;
-
-    border:1px solid #374151;
-
-    border-radius:8px;
-
-    padding:12px;
-
-    resize:vertical;
+    margin-left:20px;
 }
 
-#submit-answer{
+.help-panel li{
 
-    margin-top:15px;
-
-    background:#2563eb;
-
-    color:white;
-
-    border:none;
-
-    padding:12px 20px;
-
-    border-radius:8px;
-
-    cursor:pointer;
-
-    font-size:16px;
-}
-
-#submit-answer:hover{
-    opacity:0.9;
+    margin-bottom:10px;
 }
 
 footer{
@@ -262,18 +291,53 @@ footer{
     border-top:1px solid #2f3b4b;
 }
 
-@media(max-width:900px){
+.success-message{
 
-    .top-panel{
+    color:#4ade80;
+
+    font-weight:bold;
+}
+
+.error-message{
+
+    color:#f87171;
+}
+
+.warning-message{
+
+    color:#facc15;
+}
+
+@media(max-width:900px)
+{
+    .top-panel
+    {
         grid-template-columns:1fr;
     }
 
-    #network-diagram{
+    #network-diagram
+    {
         flex-direction:column;
     }
 
-    .line{
+    .line
+    {
         width:4px;
+
         height:40px;
+    }
+
+    header
+    {
+        flex-direction:column;
+
+        gap:15px;
+    }
+
+    .player-info
+    {
+        flex-wrap:wrap;
+
+        justify-content:center;
     }
 }
