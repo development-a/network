@@ -190,14 +190,258 @@ onclick="nextQuestion()">
 </div>
 
 <script>
+function parseConfig(text){
+
+    const state = {
+        vlans:[],
+        accessPorts:{},
+        trunkPorts:[],
+        ipAddresses:{},
+        ospfProcess:null
+    };
+
+    let currentInterface = null;
+
+    const lines = text
+        .toLowerCase()
+        .split("\n");
+
+    for(let rawLine of lines){
+
+        const line = rawLine.trim();
+
+        if(line === ""){
+            continue;
+        }
+
+        if(line.startsWith("vlan ")){
+
+            const vlan =
+            parseInt(
+                line.split(" ")[1]
+            );
+
+            if(!isNaN(vlan)){
+                state.vlans.push(vlan);
+            }
+
+            continue;
+        }
+
+        if(line.startsWith("interface ")){
+
+            currentInterface =
+            line.replace(
+                "interface ",
+                ""
+            );
+
+            continue;
+        }
+
+        if(
+            line.startsWith(
+                "switchport access vlan "
+            )
+        ){
+
+            const vlan =
+            parseInt(
+                line.split(" ").pop()
+            );
+
+            if(
+                currentInterface &&
+                !isNaN(vlan)
+            ){
+
+                state.accessPorts[
+                    currentInterface
+                ] = vlan;
+
+            }
+
+            continue;
+        }
+
+        if(
+            line ===
+            "switchport mode trunk"
+        ){
+
+            if(currentInterface){
+
+                state.trunkPorts.push(
+                    currentInterface
+                );
+
+            }
+
+            continue;
+        }
+
+        if(
+            line.startsWith(
+                "ip address "
+            )
+        ){
+
+            const parts =
+            line.split(" ");
+
+            if(
+                currentInterface &&
+                parts.length >= 4
+            ){
+
+                state.ipAddresses[
+                    currentInterface
+                ] = parts[2];
+
+            }
+
+            continue;
+        }
+
+        if(
+            line.startsWith(
+                "router ospf "
+            )
+        ){
+
+            state.ospfProcess =
+            parseInt(
+                line.split(" ")[2]
+            );
+
+            continue;
+        }
+
+    }
+
+    return state;
+
+}
+function gradeState(
+    actual,
+    expected
+){
+
+    let passed = [];
+    let failed = [];
+
+    if(expected.vlans){
+
+        expected.vlans.forEach(vlan=>{
+
+            if(
+                actual.vlans.includes(vlan)
+            ){
+                passed.push(
+                    `VLAN ${vlan}`
+                );
+            }else{
+                failed.push(
+                    `VLAN ${vlan}`
+                );
+            }
+
+        });
+
+    }
+
+    if(expected.accessPorts){
+
+        Object.entries(
+            expected.accessPorts
+        ).forEach(([port,vlan])=>{
+
+            if(
+                actual.accessPorts[port]
+                === vlan
+            ){
+
+                passed.push(
+                    `${port} VLAN${vlan}`
+                );
+
+            }else{
+
+                failed.push(
+                    `${port} VLAN${vlan}`
+                );
+
+            }
+
+        });
+
+    }
+
+    if(expected.trunkPorts){
+
+        expected.trunkPorts.forEach(port=>{
+
+            if(
+                actual.trunkPorts.includes(
+                    port
+                )
+            ){
+
+                passed.push(
+                    `${port} Trunk`
+                );
+
+            }else{
+
+                failed.push(
+                    `${port} Trunk`
+                );
+
+            }
+
+        });
+
+    }
+
+    if(
+        expected.ospfProcess
+        !== undefined
+    ){
+
+        if(
+            actual.ospfProcess
+            === expected.ospfProcess
+        ){
+
+            passed.push(
+                `OSPF ${expected.ospfProcess}`
+            );
+
+        }else{
+
+            failed.push(
+                `OSPF ${expected.ospfProcess}`
+            );
+
+        }
+
+    }
+
+    return {
+        passed,
+        failed
+    };
+
+}
 const questions = [
 
 {
-level:1,
-question:"VLAN10を作成してください",
-keywords:[
-"vlan 10"
-]
+ level:1,
+ question:"VLAN10を作成してください",
+
+ expected:{
+   vlans:[10]
+ }
 },
 
 {
@@ -322,75 +566,89 @@ document.getElementById("result")
 
 function checkAnswer(){
 
-const input =
-document
-.getElementById("cliInput")
-.value
-.toLowerCase();
+    const input =
+    document
+    .getElementById(
+        "cliInput"
+    )
+    .value;
 
-const q =
-questions[currentQuestion];
+    const state =
+    parseConfig(input);
 
-let success = true;
+    const q =
+    questions[
+        currentQuestion
+    ];
 
-for(
-let keyword of q.keywords
-){
+    const result =
+    gradeState(
+        state,
+        q.expected
+    );
 
-if(
-!input.includes(
-keyword.toLowerCase()
-)
-){
+    const resultArea =
+    document.getElementById(
+        "result"
+    );
 
-success = false;
-break;
+    if(
+        result.failed.length === 0
+    ){
 
-}
+        score +=
+        q.level * 10;
 
-}
+        correct++;
 
-const result =
-document.getElementById("result");
+        localStorage.setItem(
+            "score",
+            score
+        );
 
-if(success){
+        localStorage.setItem(
+            "correct",
+            correct
+        );
 
-score +=
-q.level * 10;
+        document
+        .getElementById(
+            "score"
+        )
+        .textContent =
+        score;
 
-correct++;
+        document
+        .getElementById(
+            "correct"
+        )
+        .textContent =
+        correct;
 
-localStorage.setItem(
-"score",
-score
-);
+        resultArea.className =
+        "success";
 
-localStorage.setItem(
-"correct",
-correct
-);
+        resultArea.innerHTML =
+        "✅ 正解";
 
-document.getElementById("score")
-.textContent =
-score;
+    }else{
 
-document.getElementById("correct")
-.textContent =
-correct;
+        resultArea.className =
+        "fail";
 
-result.className =
-"success";
+        resultArea.innerHTML =
+        `
+        ❌ 不正解<br><br>
 
-result.innerHTML =
-"✅ 正解！";
+        OK:
+        ${result.passed.join(", ")}
+        <br><br>
 
-}else{
+        不足:
+        ${result.failed.join(", ")}
+        `;
 
-result.className =
-"fail";
-
-result.innerHTML =
-"❌ 不正解";
+    }
 
 }
 
