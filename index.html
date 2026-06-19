@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Network Build Challenge</title>
+<title>Pingが通るネットワークを作れ！</title>
 
 <style>
 
@@ -30,69 +29,51 @@ header{
 
 .card{
     background:#1e293b;
-    border-radius:10px;
     padding:20px;
+    border-radius:10px;
     margin-bottom:20px;
-}
-
-.stats{
-    display:flex;
-    gap:20px;
-    flex-wrap:wrap;
-}
-
-.stat{
-    flex:1;
-    min-width:150px;
-}
-
-.label{
-    color:#94a3b8;
-}
-
-.value{
-    font-size:30px;
-    font-weight:bold;
 }
 
 .topology{
     text-align:center;
-    font-family:monospace;
-    font-size:22px;
+    font-size:28px;
     line-height:2;
+    font-family:monospace;
 }
 
-textarea{
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+input,select{
     width:100%;
-    height:250px;
-    background:black;
-    color:#00ff00;
+    padding:10px;
+    margin-top:5px;
+    margin-bottom:15px;
     border:none;
-    padding:15px;
-    font-family:monospace;
-    font-size:16px;
+    border-radius:5px;
 }
 
 button{
-    padding:12px 20px;
+    background:#2563eb;
+    color:white;
     border:none;
+    padding:12px 20px;
     border-radius:5px;
     cursor:pointer;
-    color:white;
-    margin-right:10px;
+    font-size:16px;
 }
 
-#checkBtn{
-    background:#16a34a;
-}
-
-#nextBtn{
-    background:#2563eb;
+button:hover{
+    opacity:.9;
 }
 
 #result{
-    margin-top:15px;
-    font-size:18px;
+    margin-top:20px;
+    font-size:20px;
+    font-weight:bold;
 }
 
 .success{
@@ -104,47 +85,31 @@ button{
 }
 
 </style>
-
 </head>
-
 <body>
 
 <header>
-<h1>Network Build Challenge</h1>
-<p>Cisco CLI構築トレーニング</p>
+<h1>Pingが通るネットワークを作れ！</h1>
+<p>レベル1 VLAN + Trunk</p>
 </header>
 
 <div class="container">
 
 <div class="card">
-
-<div class="stats">
-
-<div class="stat">
-<div class="label">Level</div>
-<div class="value" id="level">1</div>
-</div>
-
-<div class="stat">
-<div class="label">Score</div>
-<div class="value" id="score">0</div>
-</div>
-
-<div class="stat">
-<div class="label">Correct</div>
-<div class="value" id="correct">0</div>
-</div>
-
-</div>
-
-</div>
-
-<div class="card">
-
 <h2>課題</h2>
 
-<p id="question">
-VLAN10を作成してください
+<p>
+
+PC-A と PC-B が通信できるようにしてください。
+
+正解条件
+
+・Gi0/1 → VLAN10
+
+・Gi0/2 → VLAN10
+
+・Gi0/24 → Trunk ON
+
 </p>
 
 </div>
@@ -155,33 +120,75 @@ VLAN10を作成してください
 
 <div class="topology">
 
-PC-A <br>
-｜ <br>
-SW1 <br>
-｜ <br>
-PC-B
+💻PC-A
+
+│
+
+🔀SW1
+
+│
+
+💻PC-B
 
 </div>
+
+</div>
+
+<div class="grid">
+
+<div class="card">
+
+<h2>PC-A</h2>
+
+<label>IPアドレス</label>
+<input
+id="pcaIp"
+value="192.168.1.10">
+
+<h2>SW1</h2>
+
+<label>Gi0/1 VLAN</label>
+<select id="g1">
+
+<option>1</option>
+<option>10</option>
+<option>20</option>
+
+</select>
+
+<label>Gi0/2 VLAN</label>
+<select id="g2">
+
+<option>1</option>
+<option>10</option>
+<option>20</option>
+
+</select>
+
+<label>Gi0/24 Trunk</label>
+<select id="trunk">
+
+<option>OFF</option>
+<option>ON</option>
+
+</select>
 
 </div>
 
 <div class="card">
 
-<h2>CLI入力</h2>
+<h2>PC-B</h2>
 
-<textarea
-id="cliInput"
-placeholder="ここに設定を入力してください"></textarea>
+<label>IPアドレス</label>
+<input
+id="pcbIp"
+value="192.168.1.20">
 
-<br><br>
+<h2>操作</h2>
 
-<button id="checkBtn"
-onclick="checkAnswer()">
-採点する </button>
-
-<button id="nextBtn"
-onclick="nextQuestion()">
-次の問題 </button>
+<button onclick="runPing()">
+Ping実行
+</button>
 
 <div id="result"></div>
 
@@ -189,495 +196,103 @@ onclick="nextQuestion()">
 
 </div>
 
+</div>
+
 <script>
-function parseConfig(text){
 
-    const state = {
-        vlans:[],
-        accessPorts:{},
-        trunkPorts:[],
-        ipAddresses:{},
-        ospfProcess:null
-    };
+function runPing(){
 
-    let currentInterface = null;
+const g1 =
+document.getElementById("g1").value;
 
-    const lines = text
-        .toLowerCase()
-        .split("\n");
+const g2 =
+document.getElementById("g2").value;
 
-    for(let rawLine of lines){
+const trunk =
+document.getElementById("trunk").value;
 
-        const line = rawLine.trim();
+const pcaIp =
+document.getElementById("pcaIp").value;
 
-        if(line === ""){
-            continue;
-        }
+const pcbIp =
+document.getElementById("pcbIp").value;
 
-        if(line.startsWith("vlan ")){
+const result =
+document.getElementById("result");
 
-            const vlan =
-            parseInt(
-                line.split(" ")[1]
-            );
+if(g1 !== "10"){
 
-            if(!isNaN(vlan)){
-                state.vlans.push(vlan);
-            }
+result.className="fail";
 
-            continue;
-        }
+result.innerHTML=
+"❌ Gi0/1がVLAN10ではありません";
 
-        if(line.startsWith("interface ")){
-
-            currentInterface =
-            line.replace(
-                "interface ",
-                ""
-            );
-
-            continue;
-        }
-
-        if(
-            line.startsWith(
-                "switchport access vlan "
-            )
-        ){
-
-            const vlan =
-            parseInt(
-                line.split(" ").pop()
-            );
-
-            if(
-                currentInterface &&
-                !isNaN(vlan)
-            ){
-
-                state.accessPorts[
-                    currentInterface
-                ] = vlan;
-
-            }
-
-            continue;
-        }
-
-        if(
-            line ===
-            "switchport mode trunk"
-        ){
-
-            if(currentInterface){
-
-                state.trunkPorts.push(
-                    currentInterface
-                );
-
-            }
-
-            continue;
-        }
-
-        if(
-            line.startsWith(
-                "ip address "
-            )
-        ){
-
-            const parts =
-            line.split(" ");
-
-            if(
-                currentInterface &&
-                parts.length >= 4
-            ){
-
-                state.ipAddresses[
-                    currentInterface
-                ] = parts[2];
-
-            }
-
-            continue;
-        }
-
-        if(
-            line.startsWith(
-                "router ospf "
-            )
-        ){
-
-            state.ospfProcess =
-            parseInt(
-                line.split(" ")[2]
-            );
-
-            continue;
-        }
-
-    }
-
-    return state;
+return;
 
 }
-function gradeState(
-    actual,
-    expected
-){
 
-    let passed = [];
-    let failed = [];
+if(g2 !== "10"){
 
-    if(expected.vlans){
+result.className="fail";
 
-        expected.vlans.forEach(vlan=>{
+result.innerHTML=
+"❌ Gi0/2がVLAN10ではありません";
 
-            if(
-                actual.vlans.includes(vlan)
-            ){
-                passed.push(
-                    `VLAN ${vlan}`
-                );
-            }else{
-                failed.push(
-                    `VLAN ${vlan}`
-                );
-            }
-
-        });
-
-    }
-
-    if(expected.accessPorts){
-
-        Object.entries(
-            expected.accessPorts
-        ).forEach(([port,vlan])=>{
-
-            if(
-                actual.accessPorts[port]
-                === vlan
-            ){
-
-                passed.push(
-                    `${port} VLAN${vlan}`
-                );
-
-            }else{
-
-                failed.push(
-                    `${port} VLAN${vlan}`
-                );
-
-            }
-
-        });
-
-    }
-
-    if(expected.trunkPorts){
-
-        expected.trunkPorts.forEach(port=>{
-
-            if(
-                actual.trunkPorts.includes(
-                    port
-                )
-            ){
-
-                passed.push(
-                    `${port} Trunk`
-                );
-
-            }else{
-
-                failed.push(
-                    `${port} Trunk`
-                );
-
-            }
-
-        });
-
-    }
-
-    if(
-        expected.ospfProcess
-        !== undefined
-    ){
-
-        if(
-            actual.ospfProcess
-            === expected.ospfProcess
-        ){
-
-            passed.push(
-                `OSPF ${expected.ospfProcess}`
-            );
-
-        }else{
-
-            failed.push(
-                `OSPF ${expected.ospfProcess}`
-            );
-
-        }
-
-    }
-
-    return {
-        passed,
-        failed
-    };
-
-}
-const questions = [
-
-{
- level:1,
- question:"VLAN10を作成してください",
-
- expected:{
-   vlans:[10]
- }
-},
-
-{
-level:1,
-question:"VLAN20を作成してください",
-keywords:[
-"vlan 20"
-]
-},
-
-{
-level:2,
-question:"Gi0/1をVLAN10へ割り当ててください",
-keywords:[
-"interface gi0/1",
-"switchport access vlan 10"
-]
-},
-
-{
-level:2,
-question:"Gi0/2をVLAN20へ割り当ててください",
-keywords:[
-"interface gi0/2",
-"switchport access vlan 20"
-]
-},
-
-{
-level:3,
-question:"Gi0/24をTrunkポートにしてください",
-keywords:[
-"interface gi0/24",
-"switchport mode trunk"
-]
-},
-
-{
-level:4,
-question:"VLAN10のSVIを作成してください",
-keywords:[
-"interface vlan 10",
-"ip address"
-]
-},
-
-{
-level:5,
-question:"Gi0/0へ192.168.1.1/24を設定してください",
-keywords:[
-"interface gi0/0",
-"ip address 192.168.1.1 255.255.255.0"
-]
-},
-
-{
-level:6,
-question:"OSPFプロセス1を起動してください",
-keywords:[
-"router ospf 1"
-]
-},
-
-{
-level:7,
-question:"10.0.0.0/24をarea0へ広告してください",
-keywords:[
-"network 10.0.0.0 0.0.0.255 area 0"
-]
-},
-
-{
-level:8,
-question:"デフォルトルートを設定してください",
-keywords:[
-"ip route 0.0.0.0 0.0.0.0"
-]
-}
-
-];
-
-let currentQuestion = 0;
-
-let score =
-parseInt(
-localStorage.getItem("score")
-) || 0;
-
-let correct =
-parseInt(
-localStorage.getItem("correct")
-) || 0;
-
-document.getElementById("score").textContent =
-score;
-
-document.getElementById("correct").textContent =
-correct;
-
-loadQuestion();
-
-function loadQuestion(){
-
-const q =
-questions[currentQuestion];
-
-document.getElementById("question")
-.textContent =
-q.question;
-
-document.getElementById("level")
-.textContent =
-q.level;
-
-document.getElementById("cliInput")
-.value = "";
-
-document.getElementById("result")
-.innerHTML = "";
+return;
 
 }
 
-function checkAnswer(){
+if(trunk !== "ON"){
 
-    const input =
-    document
-    .getElementById(
-        "cliInput"
-    )
-    .value;
+result.className="fail";
 
-    const state =
-    parseConfig(input);
+result.innerHTML=
+"❌ Trunkが有効ではありません";
 
-    const q =
-    questions[
-        currentQuestion
-    ];
-
-    const result =
-    gradeState(
-        state,
-        q.expected
-    );
-
-    const resultArea =
-    document.getElementById(
-        "result"
-    );
-
-    if(
-        result.failed.length === 0
-    ){
-
-        score +=
-        q.level * 10;
-
-        correct++;
-
-        localStorage.setItem(
-            "score",
-            score
-        );
-
-        localStorage.setItem(
-            "correct",
-            correct
-        );
-
-        document
-        .getElementById(
-            "score"
-        )
-        .textContent =
-        score;
-
-        document
-        .getElementById(
-            "correct"
-        )
-        .textContent =
-        correct;
-
-        resultArea.className =
-        "success";
-
-        resultArea.innerHTML =
-        "✅ 正解";
-
-    }else{
-
-        resultArea.className =
-        "fail";
-
-        resultArea.innerHTML =
-        `
-        ❌ 不正解<br><br>
-
-        OK:
-        ${result.passed.join(", ")}
-        <br><br>
-
-        不足:
-        ${result.failed.join(", ")}
-        `;
-
-    }
+return;
 
 }
-
-}
-
-function nextQuestion(){
-
-currentQuestion++;
 
 if(
-currentQuestion >=
-questions.length
+!pcaIp.startsWith("192.168.1.")
 ){
 
-currentQuestion = 0;
+result.className="fail";
+
+result.innerHTML=
+"❌ PC-AのIPが不正です";
+
+return;
 
 }
 
-loadQuestion();
+if(
+!pcbIp.startsWith("192.168.1.")
+){
+
+result.className="fail";
+
+result.innerHTML=
+"❌ PC-BのIPが不正です";
+
+return;
 
 }
 
-window.onload = function(){
+result.className="success";
 
-loadQuestion();
+result.innerHTML=
+`
+✅ Ping成功
+
+Reply from ${pcbIp}
+
+bytes=32 time<1ms TTL=128
+`;
 
 }
+
 </script>
-
 
 </body>
 </html>
