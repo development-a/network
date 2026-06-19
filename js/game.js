@@ -13,129 +13,118 @@ class Game
 
     loadScenario()
     {
-        const scenario =
-            SCENARIOS.find(
-                s => s.level === this.level
-            );
+        const index = this.level - 1;
 
-        if(!scenario)
+        if(index >= SCENARIOS.length)
         {
             this.gameClear();
             return;
         }
 
-        this.currentScenario = scenario;
+        this.currentScenario =
+            this.cloneScenario(
+                SCENARIOS[index]
+            );
 
-        this.updateUI();
+        this.updateMission();
+
+        this.updateTopology();
+
+        this.updateHeader();
+
+        this.setPingFailed();
     }
 
-    updateUI()
+    cloneScenario(scenario)
+    {
+        return {
+
+            ...scenario,
+
+            state:
+                JSON.parse(
+                    JSON.stringify(
+                        scenario.state
+                    )
+                )
+        };
+    }
+
+    updateMission()
+    {
+        const element =
+            document.getElementById(
+                "mission-text"
+            );
+
+        element.textContent =
+            this.currentScenario.mission;
+    }
+
+    updateTopology()
+    {
+        const deviceIps =
+            document.querySelectorAll(
+                ".device-ip"
+            );
+
+        if(deviceIps.length < 2)
+        {
+            return;
+        }
+
+        deviceIps[0].textContent =
+            this.currentScenario.topology.pcIp;
+
+        deviceIps[1].textContent =
+            this.currentScenario.topology.serverIp;
+    }
+
+    updateHeader()
     {
         const levelElement =
-            document.getElementById("level");
+            document.getElementById(
+                "level"
+            );
 
         const scoreElement =
-            document.getElementById("score");
-
-        const missionElement =
-            document.getElementById("mission-text");
+            document.getElementById(
+                "score"
+            );
 
         levelElement.textContent =
             `Lv.${this.level}`;
 
         scoreElement.textContent =
             `Score: ${this.score}`;
-
-        missionElement.textContent =
-            this.currentScenario.mission;
-
-        this.updateTopology();
     }
 
-    updateTopology()
+    getState()
     {
-        const scenario =
-            this.currentScenario;
-
-        if(!scenario)
-        {
-            return;
-        }
-
-        const deviceIps =
-            document.querySelectorAll(".device-ip");
-
-        if(deviceIps.length >= 2)
-        {
-            deviceIps[0].textContent =
-                scenario.topology.pcIp;
-
-            deviceIps[1].textContent =
-                scenario.topology.serverIp;
-        }
+        return this.currentScenario.state;
     }
 
-    submitAnswer(answer)
+    isClear()
     {
-        if(!answer)
+        return this.currentScenario
+            .clearCondition(
+                this.currentScenario.state
+            );
+    }
+
+    ping()
+    {
+        if(this.isClear())
         {
-            return false;
-        }
-
-        const text =
-            answer.toLowerCase();
-
-        const keywords =
-            this.currentScenario.keywords;
-
-        let matched = 0;
-
-        for(const keyword of keywords)
-        {
-            if(
-                text.includes(
-                    keyword.toLowerCase()
-                )
-            )
-            {
-                matched++;
-            }
-        }
-
-        if(matched >= 1)
-        {
-            this.correctAnswer();
+            this.setPingSuccess();
 
             return true;
         }
 
-        this.wrongAnswer();
-
         return false;
     }
 
-    correctAnswer()
-    {
-        this.score += 100;
-
-        saveScore(this.score);
-
-        this.showPingSuccess();
-
-        window.cli.printSuccess();
-
-        setTimeout(() =>
-        {
-            this.nextLevel();
-        }, 2000);
-    }
-
-    wrongAnswer()
-    {
-        window.cli.printFailure();
-    }
-
-    showPingSuccess()
+    setPingSuccess()
     {
         const status =
             document.getElementById(
@@ -154,7 +143,7 @@ class Game
         );
     }
 
-    resetPingStatus()
+    setPingFailed()
     {
         const status =
             document.getElementById(
@@ -173,63 +162,62 @@ class Game
         );
     }
 
-    nextLevel()
+    completeStage()
+    {
+        this.score += 100;
+
+        saveScore(
+            this.score
+        );
+
+        this.updateHeader();
+
+        if(window.cli)
+        {
+            window.cli.print(
+                ""
+            );
+
+            window.cli.print(
+`==================================
+MISSION COMPLETE
+==================================`
+            );
+        }
+
+        setTimeout(
+            () =>
+            {
+                this.nextStage();
+            },
+            1500
+        );
+    }
+
+    nextStage()
     {
         this.level++;
 
-        saveLevel(this.level);
-
-        const next =
-            SCENARIOS.find(
-                s => s.level === this.level
-            );
-
-        if(!next)
-        {
-            this.gameClear();
-            return;
-        }
-
-        this.currentScenario = next;
-
-        this.resetPingStatus();
-
-        this.updateUI();
-
-        window.cli.clear();
-
-        window.cli.welcome();
-
-        window.cli.printLevelUp(
+        saveLevel(
             this.level
         );
 
-        window.cli.printMission();
-    }
+        if(
+            this.level >
+            SCENARIOS.length
+        )
+        {
+            this.gameClear();
 
-    gameClear()
-    {
-        const output =
-            document.getElementById(
-                "console-output"
-            );
+            return;
+        }
 
-        output.innerHTML +=
-`
-<div>
-==================================
-GAME CLEAR
-==================================
-全ステージクリア！
+        this.loadScenario();
 
-最終スコア: ${this.score}
-==================================
-</div>
-`;
-
-        alert(
-            `ゲームクリア！\nスコア: ${this.score}`
-        );
+        if(window.cli)
+        {
+            window.cli.resetForStage();
+        }
     }
 
     restart()
@@ -244,22 +232,37 @@ GAME CLEAR
 
         this.loadScenario();
 
-        this.resetPingStatus();
-
-        window.cli.clear();
-
-        window.cli.welcome();
-
-        window.cli.printMission();
+        if(window.cli)
+        {
+            window.cli.resetForStage();
+        }
     }
 
-    getCurrentLevel()
+    gameClear()
     {
-        return this.level;
-    }
+        saveLevel(1);
 
-    getCurrentScore()
-    {
-        return this.score;
+        if(window.cli)
+        {
+            window.cli.print("");
+
+            window.cli.print(
+`==================================
+GAME CLEAR
+==================================`
+            );
+
+            window.cli.print(
+                `Final Score : ${this.score}`
+            );
+
+            window.cli.print(
+`==================================`
+            );
+        }
+
+        alert(
+            `ゲームクリア！\nスコア: ${this.score}`
+        );
     }
 }
